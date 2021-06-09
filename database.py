@@ -42,8 +42,29 @@ class NEODatabase:
         self._approaches = approaches
 
         # TODO: What additional auxiliary data structures will be useful?
+        '''
+        Specifically, for each close approach, you should determine to which NEO its _designation corresponds, and assign that NearEarthObject to
+        the   CloseApproach's .neo attribute (which we set to None in Task 1). Additionally, you should add this close approach to the 
+        NearEarthObject's .approaches attribute, which represents a collection of CloseApproaches (which we initialized to an empty collection in Task 1).        
+        '''
+        self._designation_neo_map = {}
+        self._neo_name_map = {}
 
         # TODO: Link together the NEOs and their close approaches.
+        # O(n) -> assuming len(self._neos) == n
+        for neo in self._neos:
+            self._designation_neo_map[neo.designation] =  neo
+            if neo.name:
+                self._neo_name_map[neo.name] = neo
+            
+        # O(m) -> assuming len(self._approaches) == m
+        for approach in self._approaches:
+            if approach._designation in self._designation_neo_map:
+                curr_neo = self._designation_neo_map[approach._designation]
+                approach.neo = curr_neo
+                curr_neo.approaches.append(approach)
+              
+                
 
     def get_neo_by_designation(self, designation):
         """Find and return an NEO by its primary designation.
@@ -59,7 +80,13 @@ class NEODatabase:
         :return: The `NearEarthObject` with the desired primary designation, or `None`.
         """
         # TODO: Fetch an NEO by its primary designation.
+        return self._designation_neo_map.get(designation, None)
+        '''
+        if designation in self.designation_neo_map:
+            return self.designation_new_map[designation]
         return None
+        '''
+     
 
     def get_neo_by_name(self, name):
         """Find and return an NEO by its name.
@@ -76,7 +103,8 @@ class NEODatabase:
         :return: The `NearEarthObject` with the desired name, or `None`.
         """
         # TODO: Fetch an NEO by its name.
-        return None
+        return self._neo_name_map.get(name, None)
+      
 
     def query(self, filters=()):
         """Query close approaches to generate those that match a collection of filters.
@@ -94,4 +122,8 @@ class NEODatabase:
         """
         # TODO: Generate `CloseApproach` objects that match all of the filters.
         for approach in self._approaches:
-            yield approach
+            afterFilter = []
+            for filter in filters:
+                afterFilter.append(filter(approach))
+            if all(afterFilter):
+                yield approach

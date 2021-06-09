@@ -12,6 +12,7 @@ You'll edit this file in Part 4.
 """
 import csv
 import json
+from helpers import datetime_to_str
 
 
 def write_to_csv(results, filename):
@@ -25,6 +26,18 @@ def write_to_csv(results, filename):
     :param filename: A Path-like object pointing to where the data should be saved.
     """
     fieldnames = ('datetime_utc', 'distance_au', 'velocity_km_s', 'designation', 'name', 'diameter_km', 'potentially_hazardous')
+    
+    with open(filename, 'w', newline = '') as csvFile:
+        csv_writer = csv.writer(csvFile)
+        csv_writer.writerow(fieldnames)
+        for result in results:
+            if result.neo.name is None:
+                fName = ''
+            else:
+                fName = result.neo.name
+            line = (result.time_str, str(result.distance),str(result.velocity),result.neo.designation ,fName, str(result.neo.diameter),str(result.neo.hazardous))
+    
+            csv_writer.writerow(line)
     # TODO: Write the results to a CSV file, following the specification in the instructions.
 
 
@@ -40,3 +53,24 @@ def write_to_json(results, filename):
     :param filename: A Path-like object pointing to where the data should be saved.
     """
     # TODO: Write the results to a JSON file, following the specification in the instructions.
+    
+    list = []
+    
+    for result in results:
+        list.append(
+        {
+                "datetime_utc": datetime_to_str(result.time),
+                "distance_au": result.distance,
+                "velocity_km_s": result.velocity,
+                "designation": result._designation,
+                "neo": {
+                    "name": result.neo.name,
+                    "diameter_km": result.neo.diameter,
+                    "potentially_hazardous": result.neo.hazardous,
+                    "designation": result.neo.designation,
+                },
+            }
+        )
+        
+    with open(filename, 'w') as jFile:
+        json.dump(list, jFile, indent= 4)

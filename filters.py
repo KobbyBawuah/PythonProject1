@@ -16,6 +16,7 @@ iterator.
 
 You'll edit this file in Tasks 3a and 3c.
 """
+from itertools import islice
 import operator
 
 
@@ -71,7 +72,47 @@ class AttributeFilter:
     def __repr__(self):
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
-
+    
+class DistanceFilter(AttributeFilter):
+    @classmethod
+    def get(cls, approach):
+        """Distance.
+        """
+        return approach.distance
+    
+class DateFilter(AttributeFilter):
+    '''Date'''
+    @classmethod
+    def get(cls, approach):
+        """Time.
+        """
+        return approach.time.date()
+    
+class VelocityFilter(AttributeFilter):
+    '''VelocityFilter'''
+    @classmethod
+    def get(cls, approach):
+        """Velocity.
+        """
+        return approach.velocity
+    
+class DiameterFilter(AttributeFilter):
+    '''DiameterFilter'''
+    @classmethod
+    def get(cls, approach):
+        """Diameter.
+        """
+        return approach.neo.diameter
+    
+class HazardousFilter(AttributeFilter):
+    '''HazardousFilter'''
+    @classmethod
+    def get(cls, approach):
+        """Hazardous.
+        """
+        return approach.neo.hazardous
+    
+    
 def create_filters(date=None, start_date=None, end_date=None,
                    distance_min=None, distance_max=None,
                    velocity_min=None, velocity_max=None,
@@ -107,7 +148,34 @@ def create_filters(date=None, start_date=None, end_date=None,
     :return: A collection of filters for use with `query`.
     """
     # TODO: Decide how you will represent your filters.
-    return ()
+    result = []
+    
+    if date is not None:
+        result.append(DateFilter(operator.eq, date))
+    if start_date is not None:
+        result.append(DateFilter(operator.ge, start_date))
+    if end_date is not None:
+        result.append(DateFilter(operator.le, end_date))
+    
+    if distance_min is not None:
+        result.append(DistanceFilter(operator.ge, distance_min))
+    if distance_max is not None:
+        result.append(DistanceFilter(operator.le, distance_max))
+    
+    if velocity_min is not None:
+        result.append(VelocityFilter(operator.ge, velocity_min))
+    if velocity_max is not None:
+        result.append(VelocityFilter(operator.le, velocity_max))
+        
+    if diameter_min is not None:
+        result.append(DiameterFilter(operator.ge, diameter_min))
+    if diameter_max is not None:
+        result.append(DiameterFilter(operator.le, diameter_max))
+        
+    if hazardous is not None:
+        result.append(HazardousFilter(operator.eq, hazardous))
+
+    return (result)
 
 
 def limit(iterator, n=None):
@@ -120,4 +188,7 @@ def limit(iterator, n=None):
     :yield: The first (at most) `n` values from the iterator.
     """
     # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    if n == 0 or n is None:
+        return islice(iterator,None)
+    
+    return islice(iterator,0,n)
