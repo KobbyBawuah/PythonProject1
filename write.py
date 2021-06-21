@@ -38,7 +38,6 @@ def write_to_csv(results, filename):
             line = (result.time_str, str(result.distance),str(result.velocity),result.neo.designation ,fName, str(result.neo.diameter),str(result.neo.hazardous))
     
             csv_writer.writerow(line)
-    # TODO: Write the results to a CSV file, following the specification in the instructions.
 
 
 def write_to_json(results, filename):
@@ -52,8 +51,8 @@ def write_to_json(results, filename):
     :param results: An iterable of `CloseApproach` objects.
     :param filename: A Path-like object pointing to where the data should be saved.
     """
-    # TODO: Write the results to a JSON file, following the specification in the instructions.
-    
+
+
     list = []
     
     for result in results:
@@ -67,7 +66,7 @@ def write_to_json(results, filename):
                     "name": result.neo.name,
                     "diameter_km": result.neo.diameter,
                     "potentially_hazardous": result.neo.hazardous,
-                    "designation": result.neo.designation,
+                    "designation": result.neo.designation, 
                 },
             }
         )
